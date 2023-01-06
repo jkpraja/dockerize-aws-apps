@@ -1,0 +1,41 @@
+services:
+  landing-page:
+    image: cilsy-lp:1.0
+    build: ./landing-page
+    ports:
+      - 81:80
+    volumes:
+      - sourcecode:/var/local/apache2/htdocs
+    networks:
+      - lpnet
+  pesbuk:
+    image: pesbuk:1.0
+    build: ./sosial-media
+    ports:
+      - 80:80
+    links:
+      - pesbuk-db
+    networks:
+      - pesbuknet
+  pesbuk-db:
+    image: mysql:5.7
+    #image: pesbukdb
+    #build: ./pesbuk-db
+    volumes:
+      #- ./sosial-media/dump.sql:/etc/mysql/dump.sql
+      - ./sosial-media/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+      - db-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    networks:
+      - pesbuknet
+    #command: ["bin/sh", "./entrypoint.sh"]
+volumes:
+  db-data:
+  sourcecode:
+networks:
+  lpnet:
+  pesbuknet:
